@@ -3,10 +3,11 @@ package com.decagon.week3;
 import com.decagon.week3.enums.Roles;
 
 
-public class Person {
+public abstract class Person {
 
     protected String name;
     protected Roles role;
+
 
     public Person(String name, Roles role) {
         this.name = name;
@@ -28,5 +29,7 @@ public class Person {
     public void setRole(Roles role) {
         this.role = role;
     }
+
+
 
 }

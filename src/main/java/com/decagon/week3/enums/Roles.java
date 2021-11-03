@@ -2,6 +2,6 @@ package com.decagon.week3.enums;
 
 public enum Roles {
 
-    STUDENT, TEACHER,LIBRARIAN
+    SENIOR_STUDENT,JUNIOR_STUDENT, TEACHER,LIBRARIAN
 
 }

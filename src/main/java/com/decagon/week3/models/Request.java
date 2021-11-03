@@ -1,10 +1,12 @@
-package com.decagon.week3;
+package com.decagon.week3.models;
+
+import com.decagon.week3.interfaces.Borrower;
 
 public class Request {
 
 
-    private Borrower bookBorrower;
-    private String bookNameToBorrow;
+    private final Borrower bookBorrower;
+    private final String bookNameToBorrow;
 
     public Borrower getBookBorrower() {
         return bookBorrower;

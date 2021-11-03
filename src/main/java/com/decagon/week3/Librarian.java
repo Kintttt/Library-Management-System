@@ -1,7 +1,9 @@
 package com.decagon.week3;
 
 import com.decagon.week3.enums.Roles;
+import com.decagon.week3.interfaces.Borrower;
 import com.decagon.week3.models.Book;
+import com.decagon.week3.models.Request;
 import com.decagon.week3.models.Response;
 
 
@@ -10,20 +12,26 @@ import java.util.*;
 public class Librarian extends Person {
 
     private final Map<Book, Borrower> listOfBorrowedBooks;
-    private final Queue<Request> listOfBorrowers;
-    private final PriorityQueue<Request> priorityBasedBorrowers;
+    private final Queue<Request> bookRequestQueue;
+    private final PriorityQueue<Request> bookRequestPriorityQueue;
+    private final Library library;
+    private String implementation = "normal";
+
+
+    private int queue_Size = 10;
 
     public Librarian(
             String name,
             Roles role,
             Map<Book, Borrower> listOfBorrowedBooks,
-            Queue<Request> borrowers,
-            PriorityQueue<Request> priorityBasedBorrowers
+            Library library
     ) {
         super(name, role);
         this.listOfBorrowedBooks = listOfBorrowedBooks;
-        this.listOfBorrowers = borrowers;
-        this.priorityBasedBorrowers = priorityBasedBorrowers;
+        this.bookRequestQueue = new ArrayDeque<>();
+        this.bookRequestPriorityQueue = new PriorityQueue<>();
+        this.library = library;
+
     }
 
     public Response addBookToLibrary(Person person, Book book, int copies) {
@@ -32,9 +40,9 @@ public class Librarian extends Person {
         Response operationResponse;
 
         if (person instanceof Librarian) {
-            Library schoolLibrary = SchoolLibraryApp.getLibrary();
 
-            if (schoolLibrary.addNewBookToLibrary(book, copies)) {
+
+            if (library.addNewBookToLibrary(book, copies)) {
                 operationResponse = new Response(true, "Book Was added successfully", null);
             } else {
                 operationResponse = new Response(false, "Book already exist in the Library", null);
@@ -48,63 +56,115 @@ public class Librarian extends Person {
     }
 
 
-    public Response issueBook(Request bookRequest) {
+    public void requestForBook(Request bookRequest) {
 
-        if (Objects.equals(SchoolLibraryApp.getImplementation(), "normal")) {
-
-            if (listOfBorrowers.size() <= 10) {
-
-                listOfBorrowers.add(bookRequest);
-            }
-            else {
-
-                Request request = listOfBorrowers.poll();
-                while (request != null) {
-                    Response response = startIssuingBooks(request.getBookNameToBorrow(), request.getBookBorrower());
-                    if(!response.isOperationStatus()){
-                        return  response;
-                    }
-                    request = listOfBorrowers.poll();
-                }
-
-            }
-        } else {
-
-        }
+        addBookRequestToQueue(bookRequest);
 
     }
 
 
-    public Response returnBook(Request bookRequest) {
+   public void returnBook(Request returnBookRequest) {
+
+         for(Book book: listOfBorrowedBooks.keySet()){
+
+             if(Objects.equals(book.getName(), returnBookRequest.getBookNameToBorrow())){
+                 library.addBookCopies(book.getName(),1);
+                 listOfBorrowedBooks.remove(book);
+                 notifyResponseListener(new Response(true,"You have successfully returned "+book.getName(),null),
+                         returnBookRequest.getBookBorrower());
+                 return;
+             }
+
+         }
+
+       notifyResponseListener(new Response(false,"You cant return a book that you have not borrowed",null),
+               returnBookRequest.getBookBorrower());
+
+   }
 
 
-//        if(listOfBorrowedBooks.get()){
-//
-//        }
-//
-//        if( listOfBorrowedBooks.get(response.getData()) == borrower){
-//            return new Response(false,"You have already borrowed a book",null);
-//        }
-
-    }
-
-
-    private Response startIssuingBooks(String bookName, Borrower borrower) {
-        Response<Book> response = SchoolLibraryApp.getLibrary().checkIfBookExist(bookName);
+    private Response<Book> issueBook(String bookName, Borrower borrower) {
+        Response<Book> response = library.checkIfBookExist(bookName);
 
         if (response.isOperationStatus()) {
 
             if (listOfBorrowedBooks.get(response.getData()) == borrower) {
                 return new Response(false, "You have already borrowed " + bookName, null);
             } else {
-                listOfBorrowedBooks.put(response.getData(), borrower);
-                return new Response(true, "You have been successfully borrowed " + bookName, null);
+
+                Response<Book> response1 = library.getBook(bookName);
+
+                if(response1.isOperationStatus()){
+                    listOfBorrowedBooks.put(response.getData(), borrower);
+                    return new Response(true, "You have been successfully borrowed " + bookName, response1.getData());
+                }
+
+                else {
+
+                    return new Response(false, "All copies of " + bookName+" have been borrowed out", null);
+                }
             }
         } else {
             return new Response(false, "There is no such book in the library", null);
         }
 
     }
+
+
+    private void notifyResponseListener(Response<Book> response, Borrower borrower) {
+        borrower.getResponseListener().onResponse(response);
+
+    }
+
+
+    private void addBookRequestToQueue(Request bookRequest) {
+        if (Objects.equals(implementation, "normal")) {
+
+            if (bookRequestQueue.size() <= queue_Size) {
+
+                bookRequestQueue.add(bookRequest);
+
+            } else {
+
+                notifyResponseListener(new Response(false, "Librarian No more Accepting Book Requests", null), bookRequest.getBookBorrower());
+
+            }
+
+
+        } else if (Objects.equals(implementation, "priority")) {
+
+
+            if (bookRequestPriorityQueue.size() <= 10) {
+
+                bookRequestPriorityQueue.add(bookRequest);
+
+            } else {
+                notifyResponseListener(new Response(false, "Librarian No more Accepting Book Requests.Check Back Later", null), bookRequest.getBookBorrower());
+
+            }
+        }
+
+    }
+
+
+    public void startServicingBookRequests() {
+        Response<Book> response;
+        Request request = bookRequestQueue.poll();
+        while (request != null) {
+            response = issueBook(request.getBookNameToBorrow(), request.getBookBorrower());
+            notifyResponseListener(response, request.getBookBorrower());
+            request = bookRequestQueue.poll();
+        }
+    }
+
+    public void setImplementation(String implementation) {
+        this.implementation = implementation;
+    }
+
+    public void setQueue_Size(int queue_Size) {
+        this.queue_Size = queue_Size;
+    }
+
 
 
 }
