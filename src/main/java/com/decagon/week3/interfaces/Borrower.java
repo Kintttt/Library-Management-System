@@ -2,7 +2,7 @@ package com.decagon.week3.interfaces;
 
 import com.decagon.week3.Person;
 
-public interface Borrower extends Comparable<Person> {
+public interface Borrower {
 
 
     public void borrowBook(String bookName);

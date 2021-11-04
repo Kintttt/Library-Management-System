@@ -4,22 +4,25 @@ package com.decagon.week3;
 import com.decagon.week3.enums.Roles;
 import com.decagon.week3.interfaces.Borrower;
 import com.decagon.week3.models.Book;
+import com.decagon.week3.models.Response;
+
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class SchoolLibraryApp {
 
-    private String implementation;
+
     private Map<String, String> configMap;
     private Map<Book, Borrower> borrowedBooks;
     private Library library;
     private Librarian librarian;
     private static Scanner scanner;
-
+    private static final String  FILE_PATH = "src/resources/app_config.txt";
+    private static final String MAXIMUM_QUEUE_SIZE = "maximum_queue_size";
+    private static final String IMPLEMENTATION = "implementation";
+    private static final String LIBRARIAN_NAME = "librarian_name";
 
     public SchoolLibraryApp() {
         configMap = new HashMap<>();
@@ -48,17 +51,17 @@ public class SchoolLibraryApp {
 
     private void startApplication() throws FileNotFoundException, InterruptedException {
         System.out.println("Loading configuration settings params...");
-        Thread.sleep(3000);
+        sleep(3000);
         loadConfigurationParameters();
         System.out.println("Starting Dependency Injection...");
-        Thread.sleep(2000);
+        sleep(2000);
         initDependencies();
     }
 
 
     private void loadConfigurationParameters() throws FileNotFoundException {
 
-        scanner = new Scanner(new FileInputStream("/resources/src/app_config.txt"));
+        scanner = new Scanner(new FileInputStream(FILE_PATH));
 
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
@@ -74,16 +77,95 @@ public class SchoolLibraryApp {
     private void initDependencies() throws InterruptedException {
 
         System.out.println("Loading list of borrowed books...");
-        Thread.sleep(3000);
+        sleep(3000);
         borrowedBooks = new HashMap<>();
         System.out.println("Loading Library...");
-        Thread.sleep(3000);
+        sleep(3000);
         library = new Library();
         System.out.println("Instantiating the Librarian...");
-        Thread.sleep(3000);
-        librarian = new Librarian(configMap.get("librarian_name"), Roles.LIBRARIAN,borrowedBooks,library);
+        sleep(5000);
+        librarian = new Librarian(configMap.get(LIBRARIAN_NAME), Roles.LIBRARIAN,borrowedBooks,library);
+        librarian.setImplementation(configMap.get(IMPLEMENTATION));
+        librarian.setQueue_Size(Integer.parseInt(configMap.get(MAXIMUM_QUEUE_SIZE )));
+        System.out.println("Loading Library books...");
+        sleep(5000);
+        addBooksToLibrary();
+        System.out.println("Librarian Started accepting Requests for Books...");
+        sleep(5000);
+        createStudentsAndTeachers ();
+        System.out.println("Librarian started servicing to Book requests...\n\n");
+        sleep(5000);
+        librarian.startServicingBookRequests();
+
+
+
+
 
     }
 
 
+
+    private void sleep(int millisecond) throws InterruptedException{
+        Thread.sleep(millisecond);
+    }
+
+    private void createStudentsAndTeachers (){
+
+       List<Student> students = new ArrayList<>();
+        List<Teacher> teachers = new ArrayList<>();
+        Student temi = new Student("TEMI",Roles.SENIOR_STUDENT,librarian);
+        temi.addResponseListener(
+                response ->{
+                    System.out.println(response.getMessage());}
+        );
+
+        Student vikki = new Student("VIKKI",Roles.JUNIOR_STUDENT,librarian);
+        vikki.addResponseListener(
+                response ->{
+                    System.out.println(response.getMessage());}
+        );
+        Student odochi = new Student("ODOCHI",Roles.SENIOR_STUDENT,librarian);
+        odochi.addResponseListener(
+                response ->{
+                    System.out.println(response.getMessage());}
+        );
+
+        Student golden = new Student("GOLDEN",Roles.JUNIOR_STUDENT,librarian);
+        golden.addResponseListener(
+                response ->{
+                    System.out.println(response.getMessage());}
+        );
+
+
+        golden.borrowBook("Biology");
+        odochi.borrowBook("Mathematics");
+        temi.borrowBook("Mathematics");
+        temi.borrowBook("English");
+        golden.borrowBook("Mathematics");
+        temi.borrowBook("English");
+
+//        temi.returnBook("Mathematics");
+
+
+
+
+
+
+//        teachers.add(new Teacher("DARO",Roles.TEACHER,librarian));
+//        teachers.add(new Teacher("FRANCIS",Roles.TEACHER,librarian));
+//        teachers.add(new Teacher("REX",Roles.TEACHER,librarian));
+//        teachers.add(new Teacher("TOLU",Roles.TEACHER,librarian));
+//        teachers.add(new Teacher("DAMI",Roles.TEACHER,librarian));
+
+
+
+    }
+
+
+    private void addBooksToLibrary(){
+        librarian.addBookToLibrary(librarian,new Book("Mathematics","Temi"),2);
+        librarian.addBookToLibrary(librarian,new Book("English","Temi"),4);
+        librarian.addBookToLibrary(librarian,new Book("Biology","Temi"),4);
+        librarian.addBookToLibrary(librarian,new Book("Geography","Temi"),4);
+    }
 }

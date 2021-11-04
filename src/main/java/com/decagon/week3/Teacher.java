@@ -8,33 +8,33 @@ import com.decagon.week3.models.Request;
 public class Teacher extends Person implements Borrower {
 
 
-    private Librarian librarian;
+    private final Librarian librarian;
     private ResponseListener responseListener;
+    private int priority;
     public Teacher(String name, Roles role,Librarian librarian){
         super(name,role);
+        if(role == Roles.TEACHER){
+            this.priority = 1;
+        }
         this.librarian = librarian ;
     }
+
+
 
     @Override
     public void borrowBook(String bookName) {
 
-       librarian.requestForBook(new Request(this,bookName));
+       librarian.requestForBook(new Request(this,bookName,priority));
+
 
     }
 
     @Override
     public void returnBook(String bookName) {
-//        librarian.returnBook(new Request(this,bookName));
+      librarian.returnBook(new Request(this,bookName,priority));
     }
 
-    @Override
-    public int compareTo(Person borrower) {
-        int priority = 0;
-       if(borrower.role == Roles.SENIOR_STUDENT || borrower.role == Roles.JUNIOR_STUDENT){
-           priority = 1;
-       }
-       return priority;
-    }
+
 
 
     public void addResponseListener(ResponseListener listener){

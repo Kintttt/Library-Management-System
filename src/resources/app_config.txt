@@ -1,8 +1,8 @@
 
 
-implementation=normal
+implementation=priority
 
-maximum_queue_size=10
+maximum_queue_size=3
 
 librarian_name=Temi
 

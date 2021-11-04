@@ -25,7 +25,18 @@ public class Library {
 
 
     public Response<Book> getBook(String bookName) {
-        return checkIfBookExist(bookName);
+        Response<Book> response = checkIfBookExist(bookName);
+        if(response.isOperationStatus()){
+
+            if(libraryBooks.get(response.getData()) > 0)
+            {libraryBooks.put(response.getData(), (libraryBooks.get(response.getData())-1));}
+
+            else{
+                return new Response(false, "All Copies of this Book have been borrowed out", null);
+            }
+        }
+
+        return response;
     }
 
     public Response addBookCopies(String bookName, int copiesToAdd) {
@@ -44,9 +55,8 @@ public class Library {
 
     public Response<Book> checkIfBookExist(String bookName) {
         for (Book book : libraryBooks.keySet()) {
-            if (Objects.equals(book.getName(), bookName) && libraryBooks.get(book.getName()) > 0) {
-                libraryBooks.put(book, libraryBooks.get(book.getName()) - 1);
-                return new Response<>(true, "Book Exist", book);
+            if (Objects.equals(book.getName(), bookName)) {
+                return new Response<Book>(true, "Book Exist", book);
             }
         }
         return new Response<>(false, "Book Does Not Exist", null);

@@ -95,17 +95,17 @@ public class Librarian extends Person {
                 Response<Book> response1 = library.getBook(bookName);
 
                 if(response1.isOperationStatus()){
-                    listOfBorrowedBooks.put(response.getData(), borrower);
+                    listOfBorrowedBooks.put(response1.getData(), borrower);
                     return new Response(true, "You have been successfully borrowed " + bookName, response1.getData());
                 }
 
                 else {
 
-                    return new Response(false, "All copies of " + bookName+" have been borrowed out", null);
+                    return new Response(false, response1.getMessage(), null);
                 }
             }
         } else {
-            return new Response(false, "There is no such book in the library", null);
+            return new Response(false, response.getMessage(), null);
         }
 
     }
@@ -120,7 +120,7 @@ public class Librarian extends Person {
     private void addBookRequestToQueue(Request bookRequest) {
         if (Objects.equals(implementation, "normal")) {
 
-            if (bookRequestQueue.size() <= queue_Size) {
+            if (bookRequestQueue.size() < queue_Size) {
 
                 bookRequestQueue.add(bookRequest);
 
@@ -134,7 +134,7 @@ public class Librarian extends Person {
         } else if (Objects.equals(implementation, "priority")) {
 
 
-            if (bookRequestPriorityQueue.size() <= 10) {
+            if (bookRequestPriorityQueue.size() <= queue_Size) {
 
                 bookRequestPriorityQueue.add(bookRequest);
 
@@ -148,12 +148,18 @@ public class Librarian extends Person {
 
 
     public void startServicingBookRequests() {
+
+        Queue<Request> queue = bookRequestQueue;
+        if(Objects.equals(implementation, "priority")){
+            queue = bookRequestPriorityQueue;
+        }
+
         Response<Book> response;
-        Request request = bookRequestQueue.poll();
+        Request request = queue.poll();
         while (request != null) {
             response = issueBook(request.getBookNameToBorrow(), request.getBookBorrower());
             notifyResponseListener(response, request.getBookBorrower());
-            request = bookRequestQueue.poll();
+            request = queue.poll();
         }
     }
 
