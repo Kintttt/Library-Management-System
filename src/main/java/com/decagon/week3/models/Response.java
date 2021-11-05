@@ -4,7 +4,7 @@ public class Response<T> {
 
 
     private final boolean isOperationSuccessFull;
-    private final String  message;
+    private  String  message;
 
     public T getData() {
         return data;
@@ -24,6 +24,10 @@ public class Response<T> {
 
     public String getMessage() {
         return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

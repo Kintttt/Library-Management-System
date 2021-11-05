@@ -111,12 +111,11 @@ public class SchoolLibraryApp {
 
     private void createStudentsAndTeachers (){
 
-       List<Student> students = new ArrayList<>();
-        List<Teacher> teachers = new ArrayList<>();
         Student temi = new Student("TEMI",Roles.SENIOR_STUDENT,librarian);
         temi.addResponseListener(
                 response ->{
-                    System.out.println(response.getMessage());}
+                    System.out.println(response.getMessage());
+                }
         );
 
         Student vikki = new Student("VIKKI",Roles.JUNIOR_STUDENT,librarian);
@@ -136,6 +135,22 @@ public class SchoolLibraryApp {
                     System.out.println(response.getMessage());}
         );
 
+        Teacher daro = new Teacher("DARO",Roles.TEACHER,librarian);
+        Teacher francis = new Teacher("FRANCIS",Roles.TEACHER,librarian);
+        Teacher rex = new Teacher("REX",Roles.TEACHER,librarian);
+
+
+
+        daro.addResponseListener(response ->{
+            System.out.println(response.getMessage());});
+        francis.addResponseListener(response ->{
+            System.out.println(response.getMessage());});
+        rex.addResponseListener(response ->{
+            System.out.println(response.getMessage());});
+        daro.borrowBook("Mathematics");
+        francis.borrowBook("English");
+        rex.borrowBook("Biology");
+
 
         golden.borrowBook("Biology");
         odochi.borrowBook("Mathematics");
@@ -144,18 +159,12 @@ public class SchoolLibraryApp {
         golden.borrowBook("Mathematics");
         temi.borrowBook("English");
 
-//        temi.returnBook("Mathematics");
 
 
 
 
 
 
-//        teachers.add(new Teacher("DARO",Roles.TEACHER,librarian));
-//        teachers.add(new Teacher("FRANCIS",Roles.TEACHER,librarian));
-//        teachers.add(new Teacher("REX",Roles.TEACHER,librarian));
-//        teachers.add(new Teacher("TOLU",Roles.TEACHER,librarian));
-//        teachers.add(new Teacher("DAMI",Roles.TEACHER,librarian));
 
 
 
@@ -163,9 +172,9 @@ public class SchoolLibraryApp {
 
 
     private void addBooksToLibrary(){
-        librarian.addBookToLibrary(librarian,new Book("Mathematics","Temi"),2);
-        librarian.addBookToLibrary(librarian,new Book("English","Temi"),4);
-        librarian.addBookToLibrary(librarian,new Book("Biology","Temi"),4);
-        librarian.addBookToLibrary(librarian,new Book("Geography","Temi"),4);
+        librarian.addBookToLibrary(librarian,new Book("Mathematics","Temi"),5);
+        librarian.addBookToLibrary(librarian,new Book("English","Temi"),5);
+        librarian.addBookToLibrary(librarian,new Book("Biology","Temi"),5);
+        librarian.addBookToLibrary(librarian,new Book("Geography","Temi"),5);
     }
 }

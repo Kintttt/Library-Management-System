@@ -2,7 +2,7 @@
 
 implementation=priority
 
-maximum_queue_size=3
+maximum_queue_size=12
 
 librarian_name=Temi
 

@@ -89,14 +89,14 @@ public class Librarian extends Person {
         if (response.isOperationStatus()) {
 
             if (listOfBorrowedBooks.get(response.getData()) == borrower) {
-                return new Response(false, "You have already borrowed " + bookName, null);
+                return new Response(false, ((Person)borrower).name+", you have already borrowed " + bookName, null);
             } else {
 
                 Response<Book> response1 = library.getBook(bookName);
 
                 if(response1.isOperationStatus()){
                     listOfBorrowedBooks.put(response1.getData(), borrower);
-                    return new Response(true, "You have been successfully borrowed " + bookName, response1.getData());
+                    return new Response(true, ((Person)borrower).name+ ", you have been successfully borrowed " + bookName, response1.getData());
                 }
 
                 else {
@@ -112,6 +112,8 @@ public class Librarian extends Person {
 
 
     private void notifyResponseListener(Response<Book> response, Borrower borrower) {
+
+
         borrower.getResponseListener().onResponse(response);
 
     }
@@ -126,7 +128,7 @@ public class Librarian extends Person {
 
             } else {
 
-                notifyResponseListener(new Response(false, "Librarian No more Accepting Book Requests", null), bookRequest.getBookBorrower());
+                notifyResponseListener(new Response(false,   ((Person)bookRequest.getBookBorrower()).name+", the Librarian is no more accepting book requests", null), bookRequest.getBookBorrower());
 
             }
 
@@ -134,12 +136,12 @@ public class Librarian extends Person {
         } else if (Objects.equals(implementation, "priority")) {
 
 
-            if (bookRequestPriorityQueue.size() <= queue_Size) {
+            if (bookRequestPriorityQueue.size() < queue_Size) {
 
                 bookRequestPriorityQueue.add(bookRequest);
 
             } else {
-                notifyResponseListener(new Response(false, "Librarian No more Accepting Book Requests.Check Back Later", null), bookRequest.getBookBorrower());
+                notifyResponseListener(new Response(false, ((Person)bookRequest.getBookBorrower()).name+", the Librarian No more Accepting Book Requests.Check Back Later", null), bookRequest.getBookBorrower());
 
             }
         }
@@ -158,6 +160,7 @@ public class Librarian extends Person {
         Request request = queue.poll();
         while (request != null) {
             response = issueBook(request.getBookNameToBorrow(), request.getBookBorrower());
+            response.setMessage(((Person)request.getBookBorrower()).name+", "+response.getMessage());
             notifyResponseListener(response, request.getBookBorrower());
             request = queue.poll();
         }

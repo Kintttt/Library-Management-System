@@ -24,14 +24,14 @@ public class Teacher extends Person implements Borrower {
     @Override
     public void borrowBook(String bookName) {
 
-       librarian.requestForBook(new Request(this,bookName,priority));
+       librarian.requestForBook(new Request(this,bookName,this.priority));
 
 
     }
 
     @Override
     public void returnBook(String bookName) {
-      librarian.returnBook(new Request(this,bookName,priority));
+      librarian.returnBook(new Request(this,bookName,this.priority));
     }
 
 

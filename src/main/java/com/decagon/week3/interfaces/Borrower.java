@@ -1,6 +1,6 @@
 package com.decagon.week3.interfaces;
 
-import com.decagon.week3.Person;
+
 
 public interface Borrower {
 
