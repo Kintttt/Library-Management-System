@@ -31,7 +31,6 @@ public class Librarian extends Person {
         this.bookRequestQueue = new ArrayDeque<>();
         this.bookRequestPriorityQueue = new PriorityQueue<>();
         this.library = library;
-
     }
 
     public Response addBookToLibrary(Person person, Book book, int copies) {

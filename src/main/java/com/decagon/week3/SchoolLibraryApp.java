@@ -153,8 +153,8 @@ public class SchoolLibraryApp {
 
 
         golden.borrowBook("Biology");
-        odochi.borrowBook("Mathematics");
         temi.borrowBook("Mathematics");
+        odochi.borrowBook("Mathematics");
         temi.borrowBook("English");
         golden.borrowBook("Mathematics");
         temi.borrowBook("English");
@@ -172,7 +172,7 @@ public class SchoolLibraryApp {
 
 
     private void addBooksToLibrary(){
-        librarian.addBookToLibrary(librarian,new Book("Mathematics","Temi"),5);
+        librarian.addBookToLibrary(librarian,new Book("Mathematics","Temi"),3);
         librarian.addBookToLibrary(librarian,new Book("English","Temi"),5);
         librarian.addBookToLibrary(librarian,new Book("Biology","Temi"),5);
         librarian.addBookToLibrary(librarian,new Book("Geography","Temi"),5);
